@@ -36,17 +36,9 @@ find_package(Boost CONFIG REQUIRED log thread filesystem system)
 
 add_library(server STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/Source.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sources/Server.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sources/Client.cpp
         )
 add_executable(main
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/Source.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sources/Server.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/sources/Client.cpp
-        )
-
-target_include_directories(server
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
         )
 
 target_link_libraries(main Boost::boost Boost::log Boost::thread Boost::system Boost::filesystem server)
