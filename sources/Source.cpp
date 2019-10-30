@@ -108,9 +108,11 @@ private:
         in >> username_ >> username_;
         std::cout << username_ << " logged in" << std::endl;
         write("login ok\n");
+        BOOST_LOG_TRIVIAL(trace) << "User " << username_ << " login ok";
         update_clients_changed();
     }
     void on_ping() {
+        BOOST_LOG_TRIVIAL(trace) << "User " << username_ << " pinging";
         write(clients_changed_ ? "ping client_list_changed\n" : "ping ok\n");
         clients_changed_ = false;
     }
@@ -176,6 +178,8 @@ void handle_clients_thread() {
 
 int main() {
     init();
+    BOOST_LOG_TRIVIAL(trace) << "Started";
+
     boost::thread_group threads;
     threads.create_thread(accept_thread);
     threads.create_thread(handle_clients_thread);
