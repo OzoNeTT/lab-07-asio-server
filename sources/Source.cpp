@@ -4,6 +4,10 @@
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/log/sinks.hpp>
+#include <boost/log/utility/setup.hpp>
+#include <boost/log/trivial.hpp>
+
 using namespace boost::asio;
 using namespace boost::posix_time;
 io_service service;
@@ -14,6 +18,37 @@ typedef std::vector<client_ptr> array;
 array clients;
 boost::recursive_mutex cs;
 
+
+void init()
+{
+    boost::log::register_simple_formatter_factory<
+            boost::log::trivial::severity_level,
+            char
+    >("Severity");
+    static const std::string format = "[%TimeStamp%][%Severity%][%ThreadID%]: %Message%";
+
+    auto sinkFile = boost::log::add_file_log(
+            boost::log::keywords::file_name = "../logs/log_%N.log",
+            boost::log::keywords::rotation_size = 128 * 1024 * 1024,
+            boost::log::keywords::auto_flush = true,
+            boost::log::keywords::format = format
+    );
+    sinkFile->set_filter(
+            boost::log::trivial::severity >= boost::log::trivial::trace
+    );          // Log file setup
+
+    auto sinkConsole = boost::log::add_console_log(
+            std::cout,
+            boost::log::keywords::format = format
+    );
+    sinkConsole->set_filter(
+            boost::log::trivial::severity >= boost::log::trivial::debug
+    );      // Log console setup
+
+
+
+    boost::log::add_common_attributes();
+}
 void update_clients_changed() ;
 struct talk_to_client : boost::enable_shared_from_this<talk_to_client> {
     talk_to_client()
@@ -140,6 +175,7 @@ void handle_clients_thread() {
 }
 
 int main() {
+    init();
     boost::thread_group threads;
     threads.create_thread(accept_thread);
     threads.create_thread(handle_clients_thread);
