@@ -32,7 +32,7 @@ hunter_add_package(Boost)
 find_package(Boost CONFIG REQUIRED)
 
 hunter_add_package(Boost COMPONENTS log thread filesystem system)
-find_package(Boost CONFIG REQUIRED log thread filesystem system)
+find_package(Boost CONFIG REQUIRED log log_system thread filesystem system)
 
 add_library(server STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/Source.cpp
@@ -41,6 +41,13 @@ add_executable(main
         ${CMAKE_CURRENT_SOURCE_DIR}/sources/Source.cpp
         )
 
-target_link_libraries(main Boost::boost Boost::log Boost::thread Boost::system Boost::filesystem server)
+target_link_libraries(main
+        server)
 
-target_link_libraries(server Boost::log Boost::thread Boost::system Boost::filesystem Boost::boost)
+target_link_libraries(server
+        Boost::log
+        Boost::log_system
+        Boost::thread
+        Boost::system
+        Boost::filesystem
+        Boost::boost)
