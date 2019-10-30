@@ -170,7 +170,6 @@ void handle_clients_thread() {
         boost::recursive_mutex::scoped_lock lk(cs);
         for ( array::iterator b = clients.begin(), e = clients.end(); b != e; ++b)
             (*b)->answer_to_client();
-        // erase clients that timed out
         clients.erase(std::remove_if(clients.begin(), clients.end(),
                                      boost::bind(&talk_to_client::timed_out,_1)), clients.end());
     }
