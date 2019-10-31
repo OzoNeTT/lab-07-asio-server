@@ -20,9 +20,6 @@ jobs:
     - name: "quality"
       script:
         - docker run -t -v $(pwd):/var/builder/ -w /var/builder --entrypoint ./scripts/duplication.sh $DOCKER_IMAGE
-    - name: "memory leaks"
-      script:
-        - docker run -t -v $(pwd):/var/builder/ -w /var/builder --entrypoint ./scripts/valgrind.sh $DOCKER_IMAGE
 
 notifications:
   email: false
