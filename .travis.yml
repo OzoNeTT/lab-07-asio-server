@@ -1,25 +1,28 @@
-os: linux
-sudo: required
-language: "minimal"
-services:
-  - docker
-env:
-  - DOCKER_IMAGE="toliak/bootstrap-cpp"
 
-before_script:
-  - docker pull $DOCKER_IMAGE
+sudo: false
 
-jobs:
-  include:
-    - name: "tests"
-      script:
-        - docker run -t -v $(pwd):/var/builder/ -w /var/builder --entrypoint ./scripts/tests.sh $DOCKER_IMAGE
-    - name: "coverage"
-      script:
-        - docker run -t -v $(pwd):/var/builder/ -w /var/builder --entrypoint ./scripts/coverage.sh $DOCKER_IMAGE
-    - name: "quality"
-      script:
-        - docker run -t -v $(pwd):/var/builder/ -w /var/builder --entrypoint ./scripts/duplication.sh $DOCKER_IMAGE
+language: cpp
 
-notifications:
-  email: false
+compiler:
+  -gcc
+
+before_install:
+  - pip install --user cpp-coveralls
+
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-8" CC="gcc-8"; fi
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+
+script:
+  - ctest -V
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-8
+      - g++-8
