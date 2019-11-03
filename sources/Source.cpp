@@ -51,11 +51,25 @@ void init()
 }
 void update_clients_changed() ;
 struct talk_to_client : boost::enable_shared_from_this<talk_to_client> {
-    talk_to_client()
-            : sock_(service), started_(false), already_read_(0) {
+private:
+    ip::tcp::socket sock_;
+    enum {
+        max_msg = 1024
+    };
+    bool started_;
+    int already_read_;
+    char buff_[max_msg];
+    std::string username_;
+    bool clients_changed_;
+    ptime last_ping;
+
+public:
+    talk_to_client() : sock_(service), started_(false), already_read_(0) {
         last_ping = microsec_clock::local_time();
     }
-    std::string username() const { return username_; }
+    std::string username() const {
+        return username_;
+    }
 
     void answer_to_client() {
         try {
@@ -69,8 +83,12 @@ struct talk_to_client : boost::enable_shared_from_this<talk_to_client> {
             std::cout << "stopping " << username_ << " - no ping in time" << std::endl;
         }
     }
-    void set_clients_changed() { clients_changed_ = true; }
-    ip::tcp::socket & sock() { return sock_; }
+    void set_clients_changed() {
+        clients_changed_ = true;
+    }
+    ip::tcp::socket & sock() {
+        return sock_;
+    }
     bool timed_out() const {
         ptime now = microsec_clock::local_time();
         long long ms = (now - last_ping).total_milliseconds();
@@ -83,12 +101,10 @@ struct talk_to_client : boost::enable_shared_from_this<talk_to_client> {
 private:
     void read_request() {
         if ( sock_.available())
-            already_read_ += sock_.read_some(
-                    buffer(buff_ + already_read_, max_msg - already_read_));
+            already_read_ += sock_.read_some(buffer(buff_ + already_read_, max_msg - already_read_));
     }
     void process_request() {
-        bool found_enter = std::find(buff_, buff_ + already_read_, '\n')
-                           < buff_ + already_read_;
+        bool found_enter = std::find(buff_, buff_ + already_read_, '\n') < buff_ + already_read_;
         if ( !found_enter)
             return;
         last_ping = microsec_clock::local_time();
@@ -97,10 +113,14 @@ private:
         std::copy(buff_ + already_read_, buff_ + max_msg, buff_);
         already_read_ -= pos + 1;
 
-        if ( msg.find("login ") == 0) on_login(msg);
-        else if ( msg.find("ping") == 0) on_ping();
-        else if ( msg.find("clients") == 0) on_clients();
-        else std::cerr << "invalid msg " << msg << std::endl;
+        if ( msg.find("login ") == 0)
+            on_login(msg);
+        else if ( msg.find("ping") == 0)
+            on_ping();
+        else if ( msg.find("clients") == 0)
+            on_clients();
+        else
+            std::cerr << "invalid msg " << msg << std::endl;
     }
 
     void on_login(const std::string & msg) {
@@ -133,16 +153,7 @@ private:
     bool isStarted(){
         return  started_;
     }
-private:
-    ip::tcp::socket sock_;
-    enum { max_msg = 1024 };
-    bool started_;
-    int already_read_;
-    char buff_[max_msg];
 
-    std::string username_;
-    bool clients_changed_;
-    ptime last_ping;
 };
 
 void update_clients_changed() {
@@ -170,8 +181,7 @@ void handle_clients_thread() {
         boost::recursive_mutex::scoped_lock lk(cs);
         for ( array::iterator b = clients.begin(), e = clients.end(); b != e; ++b)
             (*b)->answer_to_client();
-        clients.erase(std::remove_if(clients.begin(), clients.end(),
-                                     boost::bind(&talk_to_client::timed_out,_1)), clients.end());
+        clients.erase(std::remove_if(clients.begin(), clients.end(), boost::bind(&talk_to_client::timed_out,_1)), clients.end());
     }
 }
 

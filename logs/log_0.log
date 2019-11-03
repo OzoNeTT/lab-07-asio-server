@@ -1,2 +1,7 @@
-[2019-10-30 10:56:21.540979][trace][0x00007f2fb55e6740]: Started
-[2019-10-30 10:56:27.879116][trace][0x00007f2fb4de4700]: User OzoNe login ok
+[2019-11-03 20:50:18.061005][trace][0x00007fa570a3a740]: Started
+[2019-11-03 20:50:34.112961][trace][0x00007fa56bfff700]: User A login ok
+[2019-11-03 20:50:37.539578][trace][0x00007fa56bfff700]: User B login ok
+[2019-11-03 20:50:39.977437][trace][0x00007fa56bfff700]: User A pinging
+[2019-11-03 20:50:42.185551][trace][0x00007fa56bfff700]: User A pinging
+[2019-11-03 20:50:44.239801][trace][0x00007fa56bfff700]: User B pinging
+[2019-11-03 20:50:47.663254][trace][0x00007fa56bfff700]: User B pinging
