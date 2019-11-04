@@ -1,7 +1,7 @@
-[2019-11-03 20:50:18.061005][trace][0x00007fa570a3a740]: Started
-[2019-11-03 20:50:34.112961][trace][0x00007fa56bfff700]: User A login ok
-[2019-11-03 20:50:37.539578][trace][0x00007fa56bfff700]: User B login ok
-[2019-11-03 20:50:39.977437][trace][0x00007fa56bfff700]: User A pinging
-[2019-11-03 20:50:42.185551][trace][0x00007fa56bfff700]: User A pinging
-[2019-11-03 20:50:44.239801][trace][0x00007fa56bfff700]: User B pinging
-[2019-11-03 20:50:47.663254][trace][0x00007fa56bfff700]: User B pinging
+[2019-11-04 03:22:47.240243][trace][0x00007f6a8009d740]: Started
+[2019-11-04 03:22:54.810574][trace][0x00007f6a7f89b700]: User ping login ok
+[2019-11-04 03:22:57.590559][trace][0x00007f6a7f89b700]: User ping pinging
+[2019-11-04 03:22:59.042055][trace][0x00007f6a7f89b700]: User ping pinging
+[2019-11-04 03:23:16.259019][trace][0x00007f6a7f89b700]: User ping pinging
+[2019-11-04 03:23:28.226312][trace][0x00007f6a7f89b700]: User ok login ok
+[2019-11-04 03:23:31.877506][trace][0x00007f6a7f89b700]: User ok pinging

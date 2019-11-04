@@ -80,7 +80,12 @@ public:
         }
         if ( timed_out()) {
             stop();
-            std::cout << "stopping " << username_ << " - no ping in time" << std::endl;
+            if(!disconnect){
+                std::cout << "stopping " << username_ << " - no ping in time" << std::endl;
+            }
+        }
+        if(disconnect) {
+            stop();
         }
     }
     void set_clients_changed() {
@@ -92,8 +97,9 @@ public:
     bool timed_out() const {
         ptime now = microsec_clock::local_time();
         long long ms = (now - last_ping).total_milliseconds();
-        return ms > 20000 ;
+        return ms > 20000 || disconnect;
     }
+    bool disconnect = false;
     void stop() {
         boost::system::error_code err;
         sock_.close(err);
@@ -119,6 +125,9 @@ private:
             on_ping();
         else if ( msg.find("clients") == 0)
             on_clients();
+        else if (msg.find("disconnect") == 0){
+            on_close();
+        }
         else
             std::cerr << "invalid msg " << msg << std::endl;
     }
@@ -133,18 +142,27 @@ private:
     }
     void on_ping() {
         BOOST_LOG_TRIVIAL(trace) << "User " << username_ << " pinging";
-        write(clients_changed_ ? "ping client_list_changed\n" : "ping ok\n");
+        write(clients_changed_ ? "client_list_changed\n" : "ping ok\n");
         clients_changed_ = false;
     }
     void on_clients() {
         std::string msg;
         { boost::recursive_mutex::scoped_lock lk(cs);
-            for( array::const_iterator b = clients.begin(), e = clients.end() ; b != e; ++b)
+            for( auto b = clients.begin(), e = clients.end() ; b != e; ++b)
                 msg += (*b)->username() + " ";
         }
         write(msg + "\n");
     }
-
+    void on_close(){
+        std::string msg;
+        msg = "Disconnected!";
+        //stop();
+        update_clients_changed();
+        //clients_changed_ = true;
+        disconnect = true;
+        std::cout << "User " << username_ << " - disconnected!" << std::endl;
+        write(msg + "\n");
+    }
 
     void write(const std::string & msg) {
         sock_.write_some(buffer(msg));
@@ -158,8 +176,8 @@ private:
 
 void update_clients_changed() {
     boost::recursive_mutex::scoped_lock lk(cs);
-    for( array::iterator b = clients.begin(), e = clients.end(); b != e; ++b)
-        (*b)->set_clients_changed();
+    for(auto & client : clients)
+        client->set_clients_changed();
 }
 
 
